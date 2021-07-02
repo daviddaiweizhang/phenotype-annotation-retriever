@@ -17,7 +17,7 @@ def rsid_to_coordinate(
     # get a cursor
     cur = cnx.cursor()
     # search for SNP by rsid
-    cols = 'chrom,chromStart,chromEnd,observed'
+    cols = 'chrom,chromStart,chromEnd,observed,alleles,alleleFreqs'
     cur.execute(f'select {cols} from {dbsnp} where name = "{rsid}"')
     # fetch matched entries
     matched = cur.fetchall()
@@ -30,7 +30,11 @@ def rsid_to_coordinate(
     else:
         if len(matched) > 1:
             print('Warning: multiple SNPs found.')
-        chrom_str, start, end, alleles_str = matched[0]
+        matched = matched[0]
+        chrom_str, start, end, alleles_str = matched[:-2]
+        allele_freqs_names, allele_freqs_vals = [
+                e.decode('ascii').split(',')[:-1]
+                for e in matched[-2:]]
 
         # get SNP chromosome
         chrom = int(chrom_str[3:])
@@ -42,15 +46,23 @@ def rsid_to_coordinate(
 
         # get SNP alleles
         alleles = alleles_str.split('/')
-        if len(alleles) != 2:
+        # sort alleles by frequencies
+        if len(allele_freqs_names) > 0:
+            assert len(allele_freqs_names) == len(alleles)
+            assert set(allele_freqs_names) == set(alleles)
+            alleles_sorted = [e for _, e in sorted(
+                zip(allele_freqs_vals, allele_freqs_names),
+                reverse=True)]
+        # get first two alleles
+        if len(alleles_sorted) != 2:
             print('Warning: SNP is not bi-allelic.')
-        ref_allele, alt_allele = alleles[:2]
+        ref_allele, alt_allele = alleles_sorted[:2]
 
     return chrom, pos, ref_allele, alt_allele
 
 
 def coordinate_to_str(chrom, pos, ref_allele, alt_allele):
-    return f'{chrom}_{pos}_{ref_allele}_{alt_allele}'
+    return f'{chrom} {pos} {ref_allele} {alt_allele}'
 
 
 def main():
@@ -73,6 +85,7 @@ def main():
                 'Examples: snp151, snp150, snp147. '
                 'Default: snp151. '))
     args = vars(parser.parse_args())
+
     coordinate = rsid_to_coordinate(**args)
     coordiante_str = coordinate_to_str(*coordinate)
     print(coordiante_str)
