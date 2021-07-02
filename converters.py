@@ -1,7 +1,8 @@
 #! /usr/bin/env python
 
-import mysql.connector
 import argparse
+
+import mysql.connector
 
 
 def rsid_to_coordinate(
