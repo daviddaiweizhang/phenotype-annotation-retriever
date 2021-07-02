@@ -5,6 +5,8 @@ import argparse
 import requests
 from pyliftover import LiftOver
 
+from converters import rsid_to_coordinate
+
 
 def convert_coordinate(
         chrom, pos, build_in, build_out):
@@ -29,49 +31,85 @@ def get_pheno_annot(
     info = requests.get(url).json()
 
     if info is None:
-        signi_pheno_list = []
+        phenos_top_str = ''
     else:
-        signi_pheno_list = [
-            pheno['phenostring'].replace(' ', '-')
-            for pheno in info['phenos']
-            if pheno['pval'] < pval_threshold]
-    strong_pheno_str = '|'.join(signi_pheno_list[:n_top_pheno])
-    return strong_pheno_str
+        phenos = [
+                pheno['phenostring'].replace(' ', '-')
+                for pheno in info['phenos']]
+        pvals = [
+                pheno['pval']
+                for pheno in info['phenos']]
+
+        phenos_signi = [
+                pheno for pval, pheno
+                in sorted(zip(pvals, phenos))
+                if pval < pval_threshold]
+        phenos_top = phenos_signi[:n_top_pheno]
+        phenos_top_str = '|'.join(phenos_top)
+    return phenos_top_str
+
+
+def get_pheno_annot_from_rsid(rsid, reference_genome):
+    chrom, pos, ref_allele, alt_allele = rsid_to_coordinate(
+            rsid=rsid,
+            reference_genome=reference_genome)
+    print(chrom, pos, ref_allele, alt_allele)
+    return get_pheno_annot(
+        chrom=chrom,
+        pos=pos,
+        ref_allele=ref_allele,
+        alt_allele=alt_allele,
+        reference_genome=reference_genome)
 
 
 def main():
 
     parser = argparse.ArgumentParser()
     parser.add_argument(
-            'chrom',
+            '--chrom',
             type=int,
             help=(
                 'Chromosome of the SNP. '
-                'Example: 3. '))
+                'Example: 19. '))
     parser.add_argument(
-            'pos',
+            '--pos',
             type=int,
             help=(
                 'Position of the SNP on the chromosome. '
-                'Example: 152567908. '))
+                'Example: 44908684. '))
     parser.add_argument(
-            'ref_allele',
+            '--ref-allele',
             help=(
                 'Reference allele of the SNP. '
-                'Example: C. '))
+                'Example: T. '))
     parser.add_argument(
-            'alt_allele',
+            '--alt-allele',
             help=(
                 'Alternative allele of the SNP. '
-                'Example: A. '))
+                'Example: C. '))
     parser.add_argument(
-            'reference_genome',
+            '--reference-genome',
             help=(
                 'Build of the reference genome. '
-                'Example: hg19'))
+                'Example: hg19. '))
+    parser.add_argument(
+            '--rsid',
+            help=(
+                'rsid of the SNP. '
+                'Example: rs429358. '))
     args = vars(parser.parse_args())
 
-    pheno_annot = get_pheno_annot(**args)
+    if args['rsid'] is None:
+        pheno_annot = get_pheno_annot(
+                chrom=args['chrom'],
+                pos=args['pos'],
+                ref_allele=args['ref_allele'],
+                alt_allele=args['alt_allele'],
+                reference_genome=args['reference_genome'])
+    else:
+        pheno_annot = get_pheno_annot_from_rsid(
+                rsid=args['rsid'],
+                reference_genome='hg38')
     print(pheno_annot)
 
 
