@@ -1,4 +1,4 @@
-# PheWeb Retriever
+# Phenotype Annotation Retriever
 
 This program provides the phenotypes associated with a given SNP.
 The association information is retrieved from 
