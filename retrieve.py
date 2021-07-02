@@ -1,6 +1,6 @@
 #! /usr/bin/env python
 
-import sys
+import argparse
 
 import requests
 from pyliftover import LiftOver
@@ -15,15 +15,16 @@ def convert_coordinate(
 
 
 def get_pheno_annot(
-        chrom, pos, ref, alt, snp_build,
+        chrom, pos, ref_allele, alt_allele, reference_genome,
         n_top_pheno=10, pval_threshold=0.05,
         gwas_name='UKB-TOPMed', gwas_build='hg38'):
 
-    if snp_build != gwas_build:
+    if reference_genome != gwas_build:
         pos = convert_coordinate(
                 chrom, pos,
-                build_in=snp_build, build_out=gwas_build)[1]
-    snp = f'{chrom}:{pos}-{ref}-{alt}'
+                build_in=reference_genome,
+                build_out=gwas_build)[1]
+    snp = f'{chrom}:{pos}-{ref_allele}-{alt_allele}'
     url = f'https://pheweb.org/{gwas_name}/api/variant/{snp}'
     info = requests.get(url).json()
 
@@ -39,14 +40,38 @@ def get_pheno_annot(
 
 
 def main():
-    chrom = int(sys.argv[1])  # e.g. 3
-    pos = int(sys.argv[2])  # e.g. 152567908
-    ref = sys.argv[3]  # e.g. 'C'
-    alt = sys.argv[4]  # e.g. 'A'
-    snp_build = sys.argv[5]  # e.g. 'hg19'
-    pheno_annot = get_pheno_annot(
-            chrom=chrom, pos=pos,
-            ref=ref, alt=alt, snp_build=snp_build)
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+            'chrom',
+            type=int,
+            help=(
+                'Chromosome of the SNP. '
+                'Example: 3. '))
+    parser.add_argument(
+            'pos',
+            type=int,
+            help=(
+                'Position of the SNP on the chromosome. '
+                'Example: 152567908. '))
+    parser.add_argument(
+            'ref_allele',
+            help=(
+                'Reference allele of the SNP. '
+                'Example: C. '))
+    parser.add_argument(
+            'alt_allele',
+            help=(
+                'Alternative allele of the SNP. '
+                'Example: A. '))
+    parser.add_argument(
+            'reference_genome',
+            help=(
+                'Build of the reference genome. '
+                'Example: hg19'))
+    args = vars(parser.parse_args())
+
+    pheno_annot = get_pheno_annot(**args)
     print(pheno_annot)
 
 
