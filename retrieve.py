@@ -96,14 +96,21 @@ def main():
                 'Example: rs429358. '))
     args = vars(parser.parse_args())
 
+    coordinate_keys = [
+            'chrom', 'pos', 'ref_allele', 'alt_allele', 'ref_genome']
+
     if args['rsid'] is None:
-        pheno_annot = get_pheno_annot(
-                chrom=args['chrom'],
-                pos=args['pos'],
-                ref_allele=args['ref_allele'],
-                alt_allele=args['alt_allele'],
-                ref_genome=args['ref_genome'])
+        coordinate_args = {
+                key: val for key, val
+                in args.items() if key in coordinate_keys}
+        pheno_annot = get_pheno_annot(**coordinate_args)
     else:
+        # TODO: change to ArgumentParser.add_subparsers
+        if not all([args[key] is None for key in coordinate_keys]):
+            raise ValueError(
+                    'None of `chrom`, `pos`, '
+                    '`ref_allele`, `alt_allele`, `ref_genome` '
+                    'can be set when `rsid` is set. ')
         pheno_annot = get_pheno_annot_from_rsid(
                 rsid=args['rsid'],
                 ref_genome='hg38')
