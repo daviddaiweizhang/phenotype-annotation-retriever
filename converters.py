@@ -6,14 +6,14 @@ import argparse
 
 def rsid_to_coordinate(
         rsid,
-        reference_genome,
+        ref_genome,
         dbsnp='snp151'):
 
     # connect to server
     cnx = mysql.connector.connect(
             host='genome-mysql.cse.ucsc.edu',
             user='genome',
-            database=reference_genome)
+            database=ref_genome)
     # get a cursor
     cur = cnx.cursor()
     # search for SNP by rsid
@@ -73,9 +73,9 @@ def main():
                 'rsid of the SNP. '
                 'Example: rs371194064. '))
     parser.add_argument(
-            'reference_genome',
+            'ref_genome',
             help=(
-                'Build of the reference genome. '
+                'Build of the ref genome. '
                 'Examples: hg19, hg38. '))
     parser.add_argument(
             '--dbsnp',
