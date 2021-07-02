@@ -14,15 +14,15 @@ pip install -r requirements.txt
 To retrieve phenotype information,
 the SNP can be defined by coordinate, e.g.
 ```
-./retrieve.py --chrom=19 --pos=44908684 --ref-allele=T --alt-allele=C --ref-genome=hg19
+./retrieve.py --chrom=19 --pos=44908684 --ref-allele=T --alt-allele=C --ref-genome=hg38
+
+# Output: Dementias|Hyperlipidemia|DisordersOfLipoidMetabolism|DeliriumDementiaAndAmnesticAndOtherCognitiveDisorders|Hypercholesterolemia|AlzheimerSDisease|CoronaryAtherosclerosis|VascularDementia|IschemicHeartDisease|MyocardialInfarction
 ```
 or by rsid, e.g.
 ```
 ./retrieve.py --rsid=rs429358
-```
-Both commands will output
-```
-Dementias|Hyperlipidemia|DisordersOfLipoidMetabolism|DeliriumDementiaAndAmnesticAndOtherCognitiveDisorders|Hypercholesterolemia|AlzheimerSDisease|CoronaryAtherosclerosis|VascularDementia|IschemicHeartDisease|MyocardialInfarction
+
+# Output: Dementias|Hyperlipidemia|DisordersOfLipoidMetabolism|DeliriumDementiaAndAmnesticAndOtherCognitiveDisorders|Hypercholesterolemia|AlzheimerSDisease|CoronaryAtherosclerosis|VascularDementia|IschemicHeartDisease|MyocardialInfarction
 ```
 
 ## Acknoledgement
