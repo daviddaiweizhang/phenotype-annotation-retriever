@@ -72,7 +72,7 @@ def main():
             'rsid',
             help=(
                 'rsid of the SNP. '
-                'Example: rs371194064. '))
+                'Example: rs429358. '))
     parser.add_argument(
             'ref_genome',
             help=(
