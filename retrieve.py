@@ -5,7 +5,7 @@ import argparse
 import requests
 
 from convert_coordinate import convert_coordinate
-from converters import rsid_to_coordinate
+from rsid_to_coordinate import rsid_to_coordinate
 
 
 def get_pheno_annot(
