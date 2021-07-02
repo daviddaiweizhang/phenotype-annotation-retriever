@@ -3,17 +3,9 @@
 import argparse
 
 import requests
-from pyliftover import LiftOver
 
+from convert_coordinate import convert_coordinate
 from converters import rsid_to_coordinate
-
-
-def convert_coordinate(
-        chrom, pos, build_in, build_out):
-    lo = LiftOver(build_in, build_out)
-    output = lo.convert_coordinate(f'chr{chrom}', pos)
-    pos_converted = output[0][1]
-    return chrom, pos_converted
 
 
 def get_pheno_annot(
@@ -96,7 +88,7 @@ def main():
             '--ref-genome',
             help=(
                 'Build of the reference genome. '
-                'Example: hg19. '))
+                'Example: hg38. '))
     parser.add_argument(
             '--rsid',
             help=(
