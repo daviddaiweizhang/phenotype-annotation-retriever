@@ -3,18 +3,26 @@
 This program provides the phenotypes associated with a given SNP.
 The association information is retrieved from 
 from the [Michigan Genomics Initiative PheWeb](http://pheweb.sph.umich.edu/).
-For example,
-```
-./retrieve.py 3 152567908 C A hg19
-```
-generates a list of diseases associated with the SNP
-located on chromosome 3 at location 152567908 (hg19 build),
-with reference allele C and alternative allele A.
 
 ## Prerequisites
 To install the required Python modules, run
 ```
 pip install -r requirements.txt
+```
+
+## Examples
+To retrieve phenotype information,
+the SNP can be defined by coordinate, e.g.
+```
+./retrieve.py --chrom=19 --pos=44908684 --ref-allele=T --alt-allele=C --ref-genome=hg19
+```
+or by rsid, e.g.
+```
+./retrieve.py --rsid=rs429358
+```
+Both commands will output
+```
+Dementias|Hyperlipidemia|DisordersOfLipoidMetabolism|DeliriumDementiaAndAmnesticAndOtherCognitiveDisorders|Hypercholesterolemia|AlzheimerSDisease|CoronaryAtherosclerosis|VascularDementia|IschemicHeartDisease|MyocardialInfarction
 ```
 
 ## Acknoledgement
